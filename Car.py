@@ -19,25 +19,30 @@ absolute wheel position
 class Car:
 
     def __init__(self):
+        #Car size and rotation
         #Position is absolute center of car
         self.x = 400
         self.y = 200
-        self.angle = np.pi
-
         self.l = 30
         self.w = 16
+        self.angle = np.pi
 
+        #Car dynamics
         self.velocity = 0
         self.acceleration = 0
         self.wheel = 0
 
+        #Sensor configuration
         self.sensor_length = 100
         self.sensor_inputs = [self.sensor_length]
 
+        #Neural network
         self.layer1 = [0.01, -0.5]
         self.thresh1 = -0.5
         self.layer2 = []
         self.thresh2 = 0
+
+        self.ANNout = []
 
     #Returns a list of 4 tuples containing (x, y) of car corners
     def get_car_boundaries(self):
@@ -54,9 +59,6 @@ class Car:
         y2 = self.y + np.cos(self.angle + np.pi - corner_angle)*diag
         y3 = self.y + np.cos(self.angle + np.pi + corner_angle)*diag
         y4 = self.y + np.cos(self.angle - corner_angle)*diag
-
-        print str(x1) + '\t' + str(y1)
-        print str(x2) + '\t' + str(y2)
 
         return [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 

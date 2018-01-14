@@ -13,11 +13,13 @@ class Track:
 
     #TODO: Extend, import
     def load_default_track(self):
-        self.obstacles.append(Obstacle(400, 400, 200, 20))
+        self.obstacles.append(Obstacle([(300, 390), (500, 390), (500, 410), (300, 410)]))
 
     #TODO: Car hitbox is wrong
     #TODO: Make it work with polygon obstacles
+    #Use this: https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect
     def detect_collision(self):
+        return None
         for car in self.cars:
             cx1 = car.x - car.l/2
             cx2 = car.x + car.l/2
@@ -42,6 +44,7 @@ class Track:
 
     #TODO: Make sensor continuous, and work for polygon obstacles
     def sensor(self, car):
+        return None
         x = car.x
         y = car.y
         angle = car.angle
@@ -77,10 +80,7 @@ class Track:
 
 class Obstacle:
 
-    #TODO: Redefine to be generalized polygon
-    def __init__(self, x, y, w, h):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        #self.rot = rot
+    #Every obstacle is defined as a polygon of points, end -> start implied
+    def __init__(self, points):
+        self.points = points
+
