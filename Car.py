@@ -19,6 +19,7 @@ absolute wheel position
 class Car:
 
     def __init__(self):
+        #Position is absolute center of car
         self.x = 400
         self.y = 200
         self.angle = np.pi
@@ -33,10 +34,31 @@ class Car:
         self.sensor_length = 100
         self.sensor_inputs = [self.sensor_length]
 
-        self.layer1 = [0.01, -0.2]
+        self.layer1 = [0.01, -0.5]
         self.thresh1 = -0.5
         self.layer2 = []
         self.thresh2 = 0
+
+    #Returns a list of 4 tuples containing (x, y) of car corners
+    def get_car_boundaries(self):
+        corner_angle = np.arctan(float(self.w)/float(self.l))
+
+        diag = np.sqrt(self.w**2/4.0 + self.l**2/4.0)
+
+        x1 = self.x + np.sin(self.angle + corner_angle)*diag
+        x2 = self.x + np.sin(self.angle + np.pi - corner_angle)*diag
+        x3 = self.x + np.sin(self.angle + np.pi + corner_angle)*diag
+        x4 = self.x + np.sin(self.angle - corner_angle)*diag
+
+        y1 = self.y + np.cos(self.angle + corner_angle)*diag
+        y2 = self.y + np.cos(self.angle + np.pi - corner_angle)*diag
+        y3 = self.y + np.cos(self.angle + np.pi + corner_angle)*diag
+        y4 = self.y + np.cos(self.angle - corner_angle)*diag
+
+        print str(x1) + '\t' + str(y1)
+        print str(x2) + '\t' + str(y2)
+
+        return [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 
     #TODO: Work out and implement proper dynamics for car
     def iterate_dynamics(self):
@@ -50,7 +72,7 @@ class Car:
     def propagate_network(self):
         self.acceleration = (self.layer1[0] * self.sensor_inputs[0] + self.layer1[1] * self.velocity) + self.thresh1
         #self.acceleration = self.layer1[0] * self.sensor_inputs[0]
-        print self.velocity
+        #print self.velocity
 
     def update_weights(self):
         pass
