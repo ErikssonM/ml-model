@@ -15,32 +15,40 @@ class Track:
     def load_default_track(self):
         self.obstacles.append(Obstacle([(300, 390), (500, 390), (500, 410), (300, 410)]))
 
-    #TODO: Car hitbox is wrong
-    #TODO: Make it work with polygon obstacles
-    #Use this: https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect
+    #Should work now?
+    #https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect
     def detect_collision(self):
-        return None
         for car in self.cars:
-            cx1 = car.x - car.l/2
-            cx2 = car.x + car.l/2
+            coords = car.get_car_boundaries()
+            coords.append(coords[0])
+            for i in range(len(coords) - 1):
+                x1 = coords[i][0]
+                y1 = coords[i][1]
+                x2 = coords[i + 1][0] - x1
+                y2 = coords[i + 1][1] - y1
+                for obs in self.obstacles:
+                    obs_coords = obs.points[:]
+                    obs_coords.append(obs_coords[0])
+                    for j in range(len(obs_coords) - 1):
+                        ox1 = obs_coords[j][0]
+                        oy1 = obs_coords[j][1]
+                        ox2 = obs_coords[j + 1][0] - ox1
+                        oy2 = obs_coords[j + 1][1] - oy1
 
-            cy1 = car.y - car.l/2
-            cy2 = car.y + car.l/2
+                        #rxs
+                        div = x2 * oy2 - y2 * ox2
 
-            for obs in self.obstacles:
-                ox1 = obs.x - obs.w/2
-                ox2 = obs.x + obs.w/2
+                        if div == 0:
+                            continue #Parallel, might be on edge
 
-                oy1 = obs.y - obs.h/2
-                oy2 = obs.y + obs.h/2
+                        #t = (q-p)xs/div
+                        t = ((ox1-x1)*oy2 - (oy1-y1)*ox2)/div
+                        #u = (q-p)xr/div
+                        u = ((ox1-x1)*y2 - (oy1-y1)*x2)/div
 
-                if ((ox1 < cx1 and cx1 < ox2 and oy1 < cy1 and cy1 < oy2)
-                    or (ox1 < cx2 and cx2 < ox2 and oy1 < cy1 and cy1 < oy2) 
-                    or (ox1 < cx2 and cx2 < ox2 and oy1 < cy2 and cy2 < oy2) 
-                    or (ox1 < cx1 and cx1 < ox2 and oy1 < cy2 and cy2 < oy2)):
-                    print 'Collision detected'
-
-
+                        if 0 <= t <= 1 and 0 <= u <= 1:
+                            return True
+        return False
 
     #TODO: Make sensor continuous, and work for polygon obstacles
     def sensor(self, car):
