@@ -29,11 +29,11 @@ class Car:
 
         #Car dynamics
         self.velocity = 0
-        self.acceleration = 1
+        self.acceleration = 0
         self.wheel = 0
 
         #Sensor configuration
-        self.sensor_length = 100
+        self.sensor_length = 300
         self.sensor_inputs = [self.sensor_length]
 
         #Neural network
@@ -65,14 +65,13 @@ class Car:
     #TODO: Work out and implement proper dynamics for car
     def iterate_dynamics(self):
         acc = min(2, max(-2, self.acceleration))
-        if not abs(self.velocity) > 5:
+        if not abs(self.velocity) > 10:
             self.velocity += acc
         self.y += self.velocity
 
         self.propagate_network()
 
     def propagate_network(self):
-        return None
         self.acceleration = (self.layer1[0] * self.sensor_inputs[0] + self.layer1[1] * self.velocity) + self.thresh1
         #self.acceleration = self.layer1[0] * self.sensor_inputs[0]
         #print self.velocity
