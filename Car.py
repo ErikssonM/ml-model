@@ -34,8 +34,12 @@ class Car:
 
         #Sensor configuration
         self.sensor_length = 200
-        self.sensor_inputs = [self.sensor_length]
-        self.sensors = [Sensor(self, self.sensor_length, 0)]
+        self.sensors = [
+                Sensor(self, self.sensor_length, 0),
+                Sensor(self, self.sensor_length, -np.pi/4.0),
+                Sensor(self, self.sensor_length, np.pi/4.0),
+                ]
+        self.sensor_inputs = [self.sensor_length for _ in self.sensors]
 
         #Neural network
         self.layer1 = [0.01, -0.5]
@@ -70,8 +74,9 @@ class Car:
             self.velocity += acc
         self.y += self.velocity
 
-        for sensor in self.sensors:
+        for i, sensor in enumerate(self.sensors):
             sensor.update_sensor_position()
+            self.sensor_inputs[i] = self.sensors[i].fire
 
         self.propagate_network()
 
@@ -94,7 +99,4 @@ class Sensor:
         self.x = self.car.x
         self.y = self.car.y
         self.angle = self.car.angle + self.rel_angle
-
-
-
 

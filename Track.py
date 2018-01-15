@@ -53,44 +53,43 @@ class Track:
 
     #TODO: Make sensor continuous, and work for polygon obstacles
     def sensor(self, car):
-        x = car.sensors[0].x
-        y = car.sensors[0].y
-        angle = car.sensors[0].angle
-        length = car.sensors[0].length
+        for sensor in car.sensors:
+            x = sensor.x
+            y = sensor.y
+            angle = sensor.angle
+            length = sensor.length
+    
+            closest = length
 
-        closest = length
+            x1 = x
+            y1 = y
+            x2 = np.sin(angle) * length
+            y2 = - np.cos(angle) * length
 
-        x1 = x
-        y1 = y
-        x2 = np.sin(angle) * length
-        y2 = - np.cos(angle) * length
+            for obs in self.obstacles:
+                obs_coords = obs.points[:]
+                obs_coords.append(obs_coords[0])
+                for j in range(len(obs_coords) - 1):
+                    ox1 = obs_coords[j][0]
+                    oy1 = obs_coords[j][1]
+                    ox2 = obs_coords[j + 1][0] - ox1
+                    oy2 = obs_coords[j + 1][1] - oy1
 
-        for obs in self.obstacles:
-            obs_coords = obs.points[:]
-            obs_coords.append(obs_coords[0])
-            for j in range(len(obs_coords) - 1):
-                ox1 = obs_coords[j][0]
-                oy1 = obs_coords[j][1]
-                ox2 = obs_coords[j + 1][0] - ox1
-                oy2 = obs_coords[j + 1][1] - oy1
+                    #rxs
+                    div = x2 * oy2 - y2 * ox2
 
-                #rxs
-                div = x2 * oy2 - y2 * ox2
+                    if div == 0:
+                        continue #Parallel, might be on edge
 
-                if div == 0:
-                    continue #Parallel, might be on edge
+                    #t = (q-p)xs/div
+                    t = ((ox1-x1)*oy2 - (oy1-y1)*ox2)/div
+                    #u = (q-p)xr/div
+                    u = ((ox1-x1)*y2 - (oy1-y1)*x2)/div
 
-                #t = (q-p)xs/div
-                t = ((ox1-x1)*oy2 - (oy1-y1)*ox2)/div
-                #u = (q-p)xr/div
-                u = ((ox1-x1)*y2 - (oy1-y1)*x2)/div
-
-                if 0 <= t <= 1 and 0 <= u <= 1:
-                    closest = min(closest, length*t)
-        print 'Sensor firing: ' + str(closest)
-        car.sensor_inputs = [closest]
-        car.sensors[0].fire = closest
-        return closest
+                    if 0 <= t <= 1 and 0 <= u <= 1:
+                        closest = min(closest, length*t)
+            print 'Sensor firing: ' + str(closest)
+            sensor.fire = closest
 
     def iterate(self):
         for car in self.cars:
