@@ -7,17 +7,32 @@ class Track:
 
     def __init__(self, cars):
         self.obstacles = []
+        #Checkpoints
+        #Finish line
+
         self.load_default_track()
 
         self.cars = cars
 
-    #TODO: Extend, import
-    def load_default_track(self):
-        self.obstacles.append(Obstacle([(300, 390), (500, 390), (500, 410), (300, 410)]))
+    def iterate(self):
+        for car in self.cars:
+            car.iterate_dynamics()
+            
+            #Feed sensor data into car
+            self.sensor(car)
+
+        collided = self.detect_collision()
+        for coll in collided:
+            self.cars.remove(coll)
+
+        if not self.cars:
+            return False
+        return True
 
     #Should work now?
     #https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect
     def detect_collision(self):
+        collided_cars = []
         for car in self.cars:
             coords = car.get_car_boundaries()
             coords.append(coords[0])
@@ -46,10 +61,9 @@ class Track:
                         #u = (q-p)xr/div
                         u = ((ox1-x1)*y2 - (oy1-y1)*x2)/div
 
-                        if 0 <= t <= 1 and 0 <= u <= 1:
-                            print 'Collision detected'
-                            return True
-        return False
+                        if 0 <= t <= 1 and 0 <= u <= 1 and car not in collided_cars:
+                            collided_cars.append(car)
+        return collided_cars
 
     def sensor(self, car):
         for sensor in car.sensors:
@@ -90,15 +104,13 @@ class Track:
             print 'Sensor firing: ' + str(closest)
             sensor.fire = closest
 
-    def iterate(self):
-        for car in self.cars:
-            car.iterate_dynamics()
-            
-            #temprary
-            self.sensor(car)
-
-        self.detect_collision()
-
+    #TODO: Extend, import
+    def load_default_track(self):
+        self.obstacles = [
+                Obstacle([(40, 40), (750, 40), (750, 60), (40, 60)]),
+                Obstacle([(40, 40), (200, 800), (0, 700), (10, 40)]),
+                Obstacle([(150, 750), (800, 800), (300, 800)]),
+                Obstacle([(750, 800), (750, 60), (800, 60), (800, 800)])]
 
 class Obstacle:
 

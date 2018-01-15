@@ -1,16 +1,16 @@
 import numpy as np
 
 '''
-ANN inputs
+ANN inputs:
 sensor1
 sensor2
 sensor3
 current velocity
 current wheel position
-current power
+current acceleration
 
-ANN outputs
-absolute power
+ANN outputs:
+absolute acceleration
 absolute wheel position
 
 1 hidden layer, 8-ish neurons
@@ -30,7 +30,7 @@ class Car:
         #Car dynamics
         self.velocity = 0
         self.acceleration = 0
-        self.wheel = np.pi/64.0
+        self.wheel = 0
 
         self.max_turn = np.pi/50.0
         self.max_acceleration = 2
@@ -46,10 +46,12 @@ class Car:
         self.sensor_inputs = [self.sensor_length for _ in self.sensors]
 
         #Neural network
-        self.layer1 = [0.01, -0.5]
-        self.thresh1 = -0.3
-        self.layer2 = []
-        self.thresh2 = 0
+        #self.layer1 = [0.01, -0.5]
+        self.layer1 = 2 * np.random.rand(6, 8) - np.ones((6, 8))
+        #self.thresh1 = -0.3
+        self.thresh1 = 2 * np.random.rand(1, 8) - np.ones((1, 8))
+        self.layer2 = 2 * np.random.rand(8, 2) - np.ones((8, 2))
+        self.thresh2 = 2 * np.random.rand(1, 2) - np.ones((1, 2))
 
         self.ANNout = []
 
@@ -92,7 +94,26 @@ class Car:
 
     #TODO: Inputs from sensors should follow an exponential pattern rather than a linear
     def propagate_network(self):
-        self.acceleration = (self.layer1[0] * self.sensor_inputs[0] + self.layer1[1] * self.velocity) + self.thresh1
+        #self.acceleration = (self.layer1[0] * self.sensor_inputs[0] + self.layer1[1] * self.velocity) + self.thresh1
+
+        #Hardcoded for 3 sensors
+        #TODO: Rescale inputs
+        ANN_in = np.array([self.sensors[0].fire,
+                self.sensors[1].fire,
+                self.sensors[2].fire,
+                self.velocity,
+                self.wheel,
+                self.acceleration])
+        hidden = np.tanh(np.dot(ANN_in, self.layer1) - self.thresh1)
+        ANN_out = np.tanh(np.dot(hidden, self.layer2) - self.thresh2)
+
+        print ANN_out
+
+        self.wheel = ANN_out[0][0] * self.max_turn
+        self.acceleration = ANN_out[0][1] * self.max_acceleration
+
+        #TODO: Rescale outputs
+
 
 class Sensor:
 
