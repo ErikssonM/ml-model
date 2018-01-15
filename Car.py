@@ -21,16 +21,20 @@ class Car:
     def __init__(self):
         #Car size and rotation
         #Position is absolute center of car
-        self.x = 400
-        self.y = 200
+        self.x = 300
+        self.y = 300
         self.l = 30
         self.w = 16
-        self.angle = np.pi
+        self.angle = np.pi/16.0
 
         #Car dynamics
         self.velocity = 0
         self.acceleration = 0
-        self.wheel = 0
+        self.wheel = np.pi/64.0
+
+        self.max_turn = np.pi/50.0
+        self.max_acceleration = 2
+        self.max_velocity = 5
 
         #Sensor configuration
         self.sensor_length = 200
@@ -67,23 +71,28 @@ class Car:
 
         return [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 
-    #TODO: Work out and implement proper dynamics for car
+    #Implemented a pretty simple model which uses the wheel position to continuously update the angle of the car
+    #The positions are then updated according to 
     def iterate_dynamics(self):
-        acc = min(2, max(-2, self.acceleration))
-        if not abs(self.velocity) > 10:
+        acc = min(self.max_acceleration, max(-self.max_acceleration, self.acceleration))
+        if not abs(self.velocity) > self.max_velocity:
             self.velocity += acc
-        self.y += self.velocity
 
+        self.angle += min(self.max_turn, max(-self.max_turn, self.wheel))
+
+        self.x += self.velocity*np.sin(self.angle)
+        self.y += self.velocity*np.cos(self.angle)
+
+        #Sensor updates, actual sensor tracking is done from track
         for i, sensor in enumerate(self.sensors):
             sensor.update_sensor_position()
             self.sensor_inputs[i] = self.sensors[i].fire
 
         self.propagate_network()
 
+    #TODO: Inputs from sensors should follow an exponential pattern rather than a linear
     def propagate_network(self):
         self.acceleration = (self.layer1[0] * self.sensor_inputs[0] + self.layer1[1] * self.velocity) + self.thresh1
-        #self.acceleration = self.layer1[0] * self.sensor_inputs[0]
-        #print self.velocity
 
 class Sensor:
 

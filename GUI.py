@@ -24,7 +24,6 @@ class GUI:
         for obs in obstacles:
             self.c.create_polygon(obs.points)
 
-    #TODO: Make it possible to render sensors and the points where they fire
     def render_cars(self, cars):
         for i in self.car_polygons:
             self.c.delete(i)
@@ -38,9 +37,9 @@ class GUI:
                 x1 = sensor.x
                 y1 = sensor.y
                 x2 = sensor.x + sensor.length*np.sin(sensor.angle)
-                y2 = sensor.y - sensor.length*np.cos(sensor.angle)
+                y2 = sensor.y + sensor.length*np.cos(sensor.angle)
                 fire_x = sensor.x + sensor.fire*np.sin(sensor.angle)
-                fire_y = sensor.y - sensor.fire*np.cos(sensor.angle)
+                fire_y = sensor.y + sensor.fire*np.cos(sensor.angle)
 
                 i = self.c.create_line(x1, y1, x2, y2)
                 self.car_polygons.append(i)

@@ -51,7 +51,6 @@ class Track:
                             return True
         return False
 
-    #TODO: Make sensor continuous, and work for polygon obstacles
     def sensor(self, car):
         for sensor in car.sensors:
             x = sensor.x
@@ -64,7 +63,7 @@ class Track:
             x1 = x
             y1 = y
             x2 = np.sin(angle) * length
-            y2 = - np.cos(angle) * length
+            y2 = np.cos(angle) * length
 
             for obs in self.obstacles:
                 obs_coords = obs.points[:]
