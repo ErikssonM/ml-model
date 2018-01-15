@@ -53,10 +53,10 @@ class Track:
 
     #TODO: Make sensor continuous, and work for polygon obstacles
     def sensor(self, car):
-        x = car.x
-        y = car.y
-        angle = car.angle
-        length = car.sensor_length
+        x = car.sensors[0].x
+        y = car.sensors[0].y
+        angle = car.sensors[0].angle
+        length = car.sensors[0].length
 
         closest = length
 
@@ -89,6 +89,7 @@ class Track:
                     closest = min(closest, length*t)
         print 'Sensor firing: ' + str(closest)
         car.sensor_inputs = [closest]
+        car.sensors[0].fire = closest
         return closest
 
     def iterate(self):

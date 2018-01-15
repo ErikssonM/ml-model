@@ -33,12 +33,13 @@ class Car:
         self.wheel = 0
 
         #Sensor configuration
-        self.sensor_length = 300
+        self.sensor_length = 200
         self.sensor_inputs = [self.sensor_length]
+        self.sensors = [Sensor(self, self.sensor_length, 0)]
 
         #Neural network
         self.layer1 = [0.01, -0.5]
-        self.thresh1 = -0.5
+        self.thresh1 = -0.3
         self.layer2 = []
         self.thresh2 = 0
 
@@ -69,6 +70,9 @@ class Car:
             self.velocity += acc
         self.y += self.velocity
 
+        for sensor in self.sensors:
+            sensor.update_sensor_position()
+
         self.propagate_network()
 
     def propagate_network(self):
@@ -76,5 +80,21 @@ class Car:
         #self.acceleration = self.layer1[0] * self.sensor_inputs[0]
         #print self.velocity
 
-    def update_weights(self):
-        pass
+class Sensor:
+
+    def __init__(self, car, length, rel_angle):
+        self.car = car
+        self.length = length
+        self.rel_angle = rel_angle
+
+        self.update_sensor_position()
+        self.fire = length
+
+    def update_sensor_position(self):
+        self.x = self.car.x
+        self.y = self.car.y
+        self.angle = self.car.angle + self.rel_angle
+
+
+
+

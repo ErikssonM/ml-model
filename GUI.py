@@ -33,3 +33,17 @@ class GUI:
             coords = car.get_car_boundaries()
             i = self.c.create_polygon(coords, fill='blue')
             self.car_polygons.append(i)
+
+            for sensor in car.sensors:
+                x1 = sensor.x
+                y1 = sensor.y
+                x2 = sensor.x + sensor.length*np.sin(sensor.angle)
+                y2 = sensor.y - sensor.length*np.cos(sensor.angle)
+                fire_x = sensor.x + sensor.fire*np.sin(sensor.angle)
+                fire_y = sensor.y - sensor.fire*np.cos(sensor.angle)
+
+                i = self.c.create_line(x1, y1, x2, y2)
+                self.car_polygons.append(i)
+
+                i = self.c.create_oval(fire_x-5, fire_y-5, fire_x+5, fire_y+5, fill='red')
+                self.car_polygons.append(i)
