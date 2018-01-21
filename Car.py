@@ -56,7 +56,8 @@ class Car:
         self.ANNout = []
 
         self.active = False #False if the simulation should not iterate this car (collided/finished)
-        self.fitness_value = None
+        self.finished = False
+        self.distance = None #Distance to finish line
 
     #Returns a list of 4 tuples containing (x, y) of car corners
     def get_car_boundaries(self):
@@ -95,12 +96,11 @@ class Car:
 
         self.propagate_network()
 
-    #TODO: Inputs from sensors should follow an exponential pattern rather than a linear
+    #TODO: Break ANN out into its own class. Should be more modular
     def propagate_network(self):
         #self.acceleration = (self.layer1[0] * self.sensor_inputs[0] + self.layer1[1] * self.velocity) + self.thresh1
 
         #Hardcoded for 3 sensors
-        #TODO: Rescale inputs
         ANN_in = np.array([self.sensors[0].fire/float(self.sensor_length),
                 self.sensors[1].fire/float(self.sensor_length),
                 self.sensors[2].fire/float(self.sensor_length),
@@ -114,9 +114,6 @@ class Car:
 
         self.wheel = ANN_out[0][0] * self.max_turn
         self.acceleration = ANN_out[0][1] * self.max_acceleration
-
-        #TODO: Rescale outputs
-
 
 class Sensor:
 

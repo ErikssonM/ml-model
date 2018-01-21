@@ -5,7 +5,7 @@ class Track:
     #TODO: Create fitness function (field?) for track
     #TODO: Timetracking?
 
-    def __init__(self, cars):
+    def __init__(self):
         self.obstacles = []
         self.finish = None
         self.iterations = 0
@@ -15,6 +15,8 @@ class Track:
         #Checkpoints
 
         self.load_default_track()
+
+    def add_cars(self, cars):
         self.cars = cars
         for car in self.cars:
             car.x = self.start_point[0]
@@ -39,10 +41,10 @@ class Track:
             return False
         return True
 
-    def set_fitness_value(self, car):
-        #Fitness value is (distance from finish)+(iterations/100)
-        dist = np.sqrt((car.x - self.finish.center[0])**2 + (car.y - self.finish.center[1])**2)
-        car.fitness_value = dist + self.iterations/100.0
+    #def set_fitness_value(self, car):
+    #    #Fitness value is (distance from finish)+(iterations/100)
+    #    dist = np.sqrt((car.x - self.finish.center[0])**2 + (car.y - self.finish.center[1])**2)
+    #    car.fitness_value = dist + self.iterations/100.0
 
     #Should work now?
     #https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect

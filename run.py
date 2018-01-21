@@ -7,7 +7,8 @@ from GUI import GUI
 
 if __name__ == '__main__':
     cars = [Car(), Car(), Car(), Car(), Car(), Car(), Car(), Car(), Car(), Car()]
-    track = Track(cars)
+    track = Track()
+    track.add_cars(cars)
     g = GUI(track)
 
     def render_loop():
