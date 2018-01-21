@@ -21,8 +21,8 @@ class Car:
     def __init__(self):
         #Car size and rotation
         #Position is absolute center of car
-        self.x = 300
-        self.y = 300
+        self.x = 0
+        self.y = 0
         self.l = 30
         self.w = 16
         self.angle = np.pi/16.0
@@ -54,6 +54,9 @@ class Car:
         self.thresh2 = 2 * np.random.rand(1, 2) - np.ones((1, 2))
 
         self.ANNout = []
+
+        self.active = False #False if the simulation should not iterate this car (collided/finished)
+        self.fitness_value = None
 
     #Returns a list of 4 tuples containing (x, y) of car corners
     def get_car_boundaries(self):
@@ -98,12 +101,12 @@ class Car:
 
         #Hardcoded for 3 sensors
         #TODO: Rescale inputs
-        ANN_in = np.array([self.sensors[0].fire,
-                self.sensors[1].fire,
-                self.sensors[2].fire,
-                self.velocity,
-                self.wheel,
-                self.acceleration])
+        ANN_in = np.array([self.sensors[0].fire/float(self.sensor_length),
+                self.sensors[1].fire/float(self.sensor_length),
+                self.sensors[2].fire/float(self.sensor_length),
+                self.velocity/float(self.max_velocity),
+                self.wheel/float(self.max_turn),
+                self.acceleration/float(self.max_acceleration)])
         hidden = np.tanh(np.dot(ANN_in, self.layer1) - self.thresh1)
         ANN_out = np.tanh(np.dot(hidden, self.layer2) - self.thresh2)
 

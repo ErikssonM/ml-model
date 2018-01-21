@@ -15,6 +15,8 @@ if __name__ == '__main__':
         if track.iterate():
             g.render(track)
             g.master.after(50, render_loop)
+        else:
+            g.quit()
 
     render_loop()
 

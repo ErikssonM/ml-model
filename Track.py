@@ -7,33 +7,50 @@ class Track:
 
     def __init__(self, cars):
         self.obstacles = []
+        self.finish = None
+        self.iterations = 0
+        self.start_point = (0, 0)
+        self.iteration_limit = 100000
+
         #Checkpoints
-        #Finish line
 
         self.load_default_track()
-
         self.cars = cars
+        for car in self.cars:
+            car.x = self.start_point[0]
+            car.y = self.start_point[1]
+            car.active = True
 
     def iterate(self):
-        for car in self.cars:
+        self.iterations += 1
+        for car in self.cars: 
+            if not car.active:
+                continue
             car.iterate_dynamics()
             
             #Feed sensor data into car
             self.sensor(car)
 
         collided = self.detect_collision()
-        for coll in collided:
-            self.cars.remove(coll)
+        #for coll in collided:
+        #    self.cars.remove(coll)
 
         if not self.cars:
             return False
         return True
+
+    def set_fitness_value(self, car):
+        #Fitness value is (distance from finish)+(iterations/100)
+        dist = np.sqrt((car.x - self.finish.center[0])**2 + (car.y - self.finish.center[1])**2)
+        car.fitness_value = dist + self.iterations/100.0
 
     #Should work now?
     #https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect
     def detect_collision(self):
         collided_cars = []
         for car in self.cars:
+            if not car.active:
+                continue
             coords = car.get_car_boundaries()
             coords.append(coords[0])
             for i in range(len(coords) - 1):
@@ -63,6 +80,7 @@ class Track:
 
                         if 0 <= t <= 1 and 0 <= u <= 1 and car not in collided_cars:
                             collided_cars.append(car)
+                            car.active = False
         return collided_cars
 
     def sensor(self, car):
@@ -107,14 +125,30 @@ class Track:
     #TODO: Extend, import
     def load_default_track(self):
         self.obstacles = [
-                Obstacle([(40, 40), (750, 40), (750, 60), (40, 60)]),
-                Obstacle([(40, 40), (200, 800), (0, 700), (10, 40)]),
-                Obstacle([(150, 750), (800, 800), (300, 800)]),
-                Obstacle([(750, 800), (750, 60), (800, 60), (800, 800)])]
+                Obstacle([(40, 40), (760, 40), (760, 20), (40, 20)]),#Border
+                Obstacle([(40, 40), (40, 860), (20, 860), (20, 40)]),
+                Obstacle([(760, 40), (760, 860), (780, 860), (780, 40)]),
+                Obstacle([(40, 860), (760, 860), (760, 880), (40, 880)]),
+                Obstacle([(40, 200), (200, 500), (700, 860), (150, 600)]),
+                Obstacle([(300, 40), (400, 400), (760, 800), (600, 200)]),
+                
+                ]
+        self.finish = Finish(700, 860, 760, 800)
+        self.start_point = (150, 100)
 
 class Obstacle:
 
     #Every obstacle is defined as a polygon of points, end -> start implied
     def __init__(self, points):
         self.points = points
+
+class Finish:
+
+    def __init__(self, x1, y1, x2, y2):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        
+        self.center = (self.x1 + (self.x2 - self.x2)/2.0, self.y1 + (self.y2 - self.y1)/2.0)
 

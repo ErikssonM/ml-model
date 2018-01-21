@@ -8,14 +8,18 @@ class GUI:
 
     def __init__(self, track):
         self.master = Tk()
-        self.c = Canvas(self.master, width=800, height=800)
+        self.c = Canvas(self.master, width=800, height=900)
         self.c.pack()
 
         self.render_obstacles(track.obstacles)
+        self.render_finish(track.finish)
 
         self.car_polygons = []
 
         self.track = track
+
+    def quit(self):
+        self.master.quit()
 
     def render(self, track):
         self.render_cars(track.cars)
@@ -23,6 +27,9 @@ class GUI:
     def render_obstacles(self, obstacles):
         for obs in obstacles:
             self.c.create_polygon(obs.points)
+
+    def render_finish(self, finish):
+        self.c.create_line(finish.x1, finish.y1, finish.x2, finish.y2, fill='green')
 
     def render_cars(self, cars):
         for i in self.car_polygons:
